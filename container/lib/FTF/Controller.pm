@@ -32,7 +32,7 @@ use parent 'Mojolicious::Controller';
 Composes ok response data.  This is used when the request completed successfully.
 
 Accepts: the data to be returned in the response
-Returns: A reference to a hash which can be passed to render()
+Returns: A boolean
 
 =cut
 
@@ -51,7 +51,7 @@ sub ok {
 Composes bad request response data.  Typically, this means that the user supplied invalid data in the request.
 
 Accepts: A string containing a reason describing why the request was invalid
-Returns: a reference to a hash that can be passed to render()
+Returns: A boolean
 
 =cut
 
@@ -68,7 +68,7 @@ sub bad_request {
 
     my %data = ( status => 400, json => \%result );
 
-    return \%data;
+    return $self->render( %data );
 }
 
 
@@ -77,7 +77,7 @@ sub bad_request {
 Composes not found response data.  This is used when there is no configured route matching the request.
 
 Accepts: a string indicating the path component of the request URI
-Returns: A reference to a hash which can be passed to render()
+Returns: A boolean
 
 =cut
 
@@ -94,7 +94,7 @@ sub not_found {
 
     my %data = ( status => 404, json => \%result );
 
-    return \%data;
+    return $self->render( %data );
 }
 
 
@@ -103,7 +103,7 @@ sub not_found {
 Composes error response data.  This is used when the request cannot be completed due to an error.
 
 Accepts: A string indicating the error message
-Returns: A reference to a hash which can be passed to render()
+Returns: A boolean
 
 =cut
 
@@ -120,7 +120,7 @@ sub error {
 
     my %data = ( status => 500, json => \%result );
 
-    return \%data;
+    return $self->render( %data );
 }
 
 
