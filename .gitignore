@@ -1,0 +1,3 @@
+container/conf/*.yml
+container/data/*
+container/log/*.log

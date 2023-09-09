@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  app:
+    container_name: finder-app
+    image: app/finder-app
+    build:
+      context: ./container
+    ports:
+      - '3000:3000/tcp'
+    volumes:
+      - './container/conf:/opt/app/conf'
+      - './container/data:/opt/app/data'
+      - './container/lib:/opt/app/lib'
+      - './container/log:/opt/app/log'
+      - './container/script:/opt/app/script'
+      - './container/t:/opt/app/t'
+      - './container/dispatch.fcgi:/opt/app/dispatch.fcgi'
+    environment:
+      - 'TZ=America/Chicago'
+    logging:
+      driver: json-file
+    command: [ 'plackup', '-p', '3000', '/opt/app/dispatch.fcgi' ]
