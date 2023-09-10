@@ -21,6 +21,7 @@ use Config::Merge;
 use File::Spec;
 use Try::Tiny;
 
+use Mojolicious::Plugin::Database;
 use MojoX::Log::Log4perl;
 
 use FTF::Hook;
@@ -105,6 +106,9 @@ sub configure_plugins {
 
     # Put plugin configuration here
     # This is where we configure authentication, authorization, database connections, etc
+    my $config = $self->config();
+
+    $self->plugin( Database => $config->{database} );
 
     $self->renderer->default_format( 'json' );
 

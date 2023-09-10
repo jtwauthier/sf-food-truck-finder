@@ -1,3 +1,6 @@
+database:
+  dsn: DBI:SQLite:dbname=/opt/app/data/FTData.db
+
 logging:
   log4perl.rootLogger: DEBUG, file
   log4perl.appender.file: Log::Log4perl::Appender::File

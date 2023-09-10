@@ -2,6 +2,10 @@ package FTF::Controller::System;
 
 =pod
 
+=head1 DESCRIPTION
+
+FTF::Controller::System is the system controller for the Food Truck Finder application.  It implements route handler methods for the system level routes.
+
 =cut
 
 
@@ -25,6 +29,10 @@ Returns: Response data
 
 sub retrieve_index {
     my ( $self ) = @_;
+    my $type = $self->req->param( 'type' );
+    my $start = $self->req->param( 'start' );
+    my $range = $self->req->param( 'range' );
+    my $active = $self->req->param( 'active' );
 
     my %data = ();
 
