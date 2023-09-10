@@ -52,7 +52,7 @@ Returns: response data
 sub default {
     my ( $self ) = @_;
 
-    my $path = '';
+    my $path = $self->req->url->path();
 
     return $self->not_found( $path );
 }
