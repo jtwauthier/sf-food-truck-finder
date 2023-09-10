@@ -6,6 +6,22 @@ package FTF::Controller::System;
 
 FTF::Controller::System is the system controller for the Food Truck Finder application.  It implements route handler methods for the system level routes.
 
+=head1 TO-DOS
+
+=over 4
+
+=item Add input validation and more comprehensive error handling
+
+=item Add additional filter options
+
+=item explore the data source API to see if distance is an option (This would require live requests to the API)
+
+=item Move database queries into a separate module.  It would be ideal to switch to using either SQL::Abstract or DBIC.  Although, DBIC may be overkill for such a light weight application.
+
+=item integrate the app with yelp or some other type of system so that customer reviews can be included in the output.
+
+=back
+
 =cut
 
 
@@ -29,12 +45,43 @@ Returns: Response data
 
 sub retrieve_index {
     my ( $self ) = @_;
-    my $type = $self->req->param( 'type' );
-    my $start = $self->req->param( 'start' );
-    my $range = $self->req->param( 'range' );
-    my $active = $self->req->param( 'active' );
 
-    my %data = ();
+    my $foods = $self->req->param( 'foods' ) // '';
+    my $size = $self->req->param( 'size' ) // '';
+
+    my $query = 'select * from vendors where facility_type = ? and status != ?';
+    my @params = ( 'Truck', 'EXPIRED' );
+
+    if ( $foods ne '' ) {
+        foreach my $food ( split /,/, $foods ) {
+            $query .= ' and food_items like ?';
+
+            push @params, "\%$food%";
+        }
+    }
+
+    if ( $size ne '' ) {
+        $query .= ' limit ?';
+
+        push @params, $size;
+    }
+
+    $self->log->info( sprintf( "Searching for vendors using filters: foods=%s size=%s", $foods, $size ) );
+
+    my $results = $self->db->selectall_hashref( $query, 'object_id', undef, @params );
+
+    if ( ! defined $results ) {
+        $results = {};
+    }
+
+    my $total = scalar( keys %{ $results } );
+
+    $self->log->info( sprintf( 'Found %d vendors', $total ) );
+
+    my %data = (
+        vendors => $results,
+        total => $total
+    );
 
     return $self->ok( \%data );
 }

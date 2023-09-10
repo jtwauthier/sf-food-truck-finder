@@ -14,6 +14,14 @@
 
 t/FTF/app.t is a integration test for the Food Truck Finder application.
 
+=head1 TO-DOS
+
+=over 4
+
+=item Add more comprehensive tests
+
+=back
+
 =cut
 
 
@@ -45,10 +53,11 @@ Tests the index route
 tests test_retrieve_index_route => sub {
     plan 4;
 
-    $client->get_ok( '/' );
+    $client->get_ok( '/?size=1&foods=taco' );
     $client->status_is( 200 );
     $client->json_is( '/success' => 1 );
-    $client->json_is( '/result' => {} );
+
+    $client->json_is( '/result/total' => 1 );
 };
 
 

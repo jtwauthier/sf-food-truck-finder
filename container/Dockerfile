@@ -14,7 +14,8 @@ RUN sqlite3 /opt/app/data/FTData.db < /opt/app/data/schema.sql
 
 RUN cpanm strictures Mojolicious Mojolicious::Command::fastcgi Log::Log4perl \
     MojoX::Log::Log4perl JSON Test2::Suite Config::Merge Config::General \
-    Data::Dump HTTP::Tiny Try::Tiny DBI Mojolicious::Plugin::Database Test2::MojoX
+    Data::Dump HTTP::Tiny Try::Tiny DBI Mojolicious::Plugin::Database \
+    Test2::MojoX Geo::Distance::Google
 
 COPY script/getFTData.pl /opt/app/script/getFTData.pl
 
