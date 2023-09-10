@@ -1,3 +1,7 @@
 container/conf/*.yml
-container/data/*
+
+container/data/*.db
+container/data/*.json
+
+
 container/log/*.log
