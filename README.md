@@ -46,7 +46,7 @@ $ curl http://localhost:3000/?keywords=taco,burger&size=5
 
 If you would like to see what the application is doing internally, you can check out the log.
 
-$ docker logs f
+$ docker exec finder-app cat log/ftf.log
 
 ## Notes
 
