@@ -36,7 +36,23 @@ my $client = Test2::MojoX->new( $CLASS );
 
 =head1 TESTS
 
-head2 test_default_route
+head2 test_retrieve_index_route
+
+Tests the index route
+
+=cut
+
+tests test_retrieve_index_route => sub {
+    plan 4;
+
+    $client->get_ok( '/' );
+    $client->status_is( 200 );
+    $client->json_is( '/success' => 1 );
+    $client->json_is( '/result' => {} );
+};
+
+
+=head2 test_default_route
 
 Tests the default route
 
@@ -45,10 +61,15 @@ Tests the default route
 tests test_default_route => sub {
     plan 4;
 
-    $client->get_ok( '/' );
-    $client->status_is( 200 );
-    $client->json_is( '/success' => 1 );
-    $client->json_is( '/result' => {} );
+    my %error = (
+        message => 'The requested operation could not be completed.',
+        reason => 'The specified resource, /blah, is currently unavailable.'
+    );
+
+    $client->get_ok( '/blah' );
+    $client->status_is( 404 );
+    $client->json_is( '/success' => 0 );
+    $client->json_is( '/error' => \%error );
 };
 
 
