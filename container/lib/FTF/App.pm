@@ -7,6 +7,18 @@ package FTF::App;
 
 FTF::App is the main application class in the Food Truck Finder project.  It is responsible for configuring, initializing, and setting up the resources that the application needs to run properly.
 
+=head1 TO-DOS
+
+=over 4
+
+=item Do something more elegant with loading and setting application configuration
+
+=item Set up not_found and error helpers for error handling.
+
+=item Potentially do something more elegant with logger settup and configuration.
+
+=back
+
 =cut
 
 
@@ -32,7 +44,7 @@ use FTF::Hook;
 
 =method startup
 
-This is the method which gets called when the application starts.  we use it to call our individual configuration methods.  It doesn't accept or return any parameters.
+This is the method which gets called when the application starts.  we use it to call our individual configuration methods.
 
 =cut
 
@@ -44,12 +56,6 @@ sub startup {
     my $logger = MojoX::Log::Log4perl->new( $config->{logging} );
 
     $self->log( $logger );
-
-    my $filename = File::Spec->catfile( $self->home(), 'data', 'FTData.json' );
-    my $ft_data = $self->load_ft_data( $filename );
-
-    $config->{ft_data} = $ft_data;
-
     $self->config( $config );
 
     $self->configure_plugins();
@@ -57,41 +63,6 @@ sub startup {
     $self->configure_routes();
 
     return;
-}
-
-
-=method load_ft_data
-
-Loads food truck data from the specified file
-
-Accepts: a string representing a filename
-Returns: A reference to an array containing food truck data which was read from the specified file
-
-=cut
-
-sub load_ft_data {
-    my ( $self, $filename ) = @_;
-
-    local $/ = undef;
-
-    open( my $fh, '<', $filename );
-
-    my $content = <$fh>;
-
-    close( $fh );
-
-    my $data = [];
-
-    try {
-        $data = decode_json( $content );
-
-        $self->log->info( 'Imported food truck data from file successfully' );
-    }
-    catch {
-        $self->log->warn( 'Could not import food truck data from file successfully: %s', $_ );
-    };
-
-    return $data;
 }
 
 

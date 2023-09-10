@@ -1,7 +1,2 @@
-container/conf/*.yml
-
 container/data/*.db
 container/data/*.json
-
-
-container/log/*.log

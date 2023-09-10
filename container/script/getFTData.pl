@@ -16,6 +16,12 @@ getFTData.pl retrieves food truck data from the sfgov.org website and saves it t
 
 =item Create a cron job to refresh this data periodically.
 
+=item use the local copy of the data to load data into the database instead of pulling from the remote server each time.
+
+=item Move the URL to the config file.
+
+=item use SQL::Abstract to build the insert query.
+
 =back
 
 =cut

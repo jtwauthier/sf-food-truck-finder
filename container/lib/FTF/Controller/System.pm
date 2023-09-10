@@ -14,9 +14,9 @@ FTF::Controller::System is the system controller for the Food Truck Finder appli
 
 =item Add additional filter options
 
-=item explore the data source API to see if distance is an option (This would require live requests to the API)
+=item explore the data source API to see if distance is an option (This would require live requests to the API)  Alternately, the app could make requests to the Google APIs.
 
-=item Move database queries into a separate module.  It would be ideal to switch to using either SQL::Abstract or DBIC.  Although, DBIC may be overkill for such a light weight application.
+=item Move database queries into a separate module.
 
 =item integrate the app with yelp or some other type of system so that customer reviews can be included in the output.
 
@@ -29,6 +29,10 @@ use strictures 2;
 use 5.020;
 
 use parent 'FTF::Controller';
+
+use Try::Tiny;
+
+use SQL::Abstract::Limit;
 
 
 # VERSION
@@ -46,33 +50,47 @@ Returns: Response data
 sub retrieve_index {
     my ( $self ) = @_;
 
-    my $foods = $self->req->param( 'foods' ) // '';
+    my $keywords = $self->req->param( 'keywords' ) // '';
     my $size = $self->req->param( 'size' ) // '';
 
-    my $query = 'select * from vendors where facility_type = ? and status != ?';
-    my @params = ( 'Truck', 'EXPIRED' );
+    my %conditions = (
+        facility_type => 'Truck',
+        status => { '!=' => 'EXPIRED' },
+    );
 
-    if ( $foods ne '' ) {
-        foreach my $food ( split /,/, $foods ) {
-            $query .= ' and food_items like ?';
+    if ( $keywords ne '' ) {
+        $conditions{applicant} = [];
+        $conditions{food_items} = [];
 
-            push @params, "\%$food%";
+        foreach my $token ( split /,/, $keywords ) {
+            push @{ $conditions{applicant} }, { like => "\%$token%" };
+            push @{ $conditions{food_items} }, { like => "\%$token%" };
         }
     }
 
+    my @args = ( 'vendors', '*', \%conditions, undef );
+
     if ( $size ne '' ) {
-        $query .= ' limit ?';
-
-        push @params, $size;
+        push @args, $size;
     }
 
-    $self->log->info( sprintf( "Searching for vendors using filters: foods=%s size=%s", $foods, $size ) );
+    my $engine = SQL::Abstract::Limit->new( limit_dialect => $self->db() );
+    my ( $query, @params ) = $engine->select( @args );
 
-    my $results = $self->db->selectall_hashref( $query, 'object_id', undef, @params );
+    $self->log->info( sprintf( "Searching for vendors using filters: keywords=%s size=%s\n%s", $keywords, $size, $query ) );
 
-    if ( ! defined $results ) {
-        $results = {};
+    my $results = {};
+
+    try {
+        $results = $self->db->selectall_hashref( $query, 'object_id', undef, @params );
+
+        $results //= {};
     }
+    catch {
+        my $error = $_;
+
+        $self->log->error( sprintf( 'The request failed: %s', $error ) );
+    };
 
     my $total = scalar( keys %{ $results } );
 

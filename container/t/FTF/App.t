@@ -5,14 +5,14 @@
 =head1 SYNOPSIS
 
     # To run all tests
-    prove -lv t/FTF/app.t
+    prove -lv t/FTF/App.t
 
     # To run a single test
-    T2_WORKFLOW=test_whatever prove -lv t/FTF/app.t
+    T2_WORKFLOW=test_whatever prove -lv t/FTF/App.t
 
 =head1 DESCRIPTION
 
-t/FTF/app.t is a integration test for the Food Truck Finder application.
+t/FTF/app.t is a system test for the Food Truck Finder application.
 
 =head1 TO-DOS
 
